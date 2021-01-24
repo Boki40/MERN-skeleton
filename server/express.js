@@ -10,15 +10,18 @@ import Template from "./../template";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 
-import devBundle from "./devBundle";
-
 import path from "path";
 
 const CURRENT_WORKING_DIR = process.cwd();
 
-const app = express();
+//comment out in production
+import devBundle from "./devBundle";
+import React from "react";
+import { StaticRouter } from "react-router";
+import MainRouter from "../client/MainRouter";
+import ReactDOMServer from "react-dom/server";
 
-app.use("/dist", express.static(path.join(CURRENT_WORKING_DIR, "dist")));
+const app = express();
 
 //Ki kell commentelni build esetén
 devBundle.compile(app);
@@ -30,8 +33,16 @@ app.use(compress());
 app.use(helmet());
 app.use(cors());
 
+app.use("/dist", express.static(path.join(CURRENT_WORKING_DIR, "dist")));
 app.get("/", (req, res) => {
-  res.status(200).send(Template());
+  const context = {};
+  const markup = ReactDOMServer.renderToString(
+    <StaticRouter location={req.url} context={context}>
+      <MainRouter />
+    </StaticRouter>
+  );
+
+  res.status(200).send(Template({ markup: markup }));
 });
 
 app.use("/", userRoutes);

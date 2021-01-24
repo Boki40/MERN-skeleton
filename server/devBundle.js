@@ -1,8 +1,8 @@
-import config from "../config/config";
+import config from "./../config/config";
 import webpack from "webpack";
 import webpackMiddleware from "webpack-dev-middleware";
-import webpackConfig from "./../webpack.config.client";
-import WebpackHotMiddleware from "webpack-hot-middleware";
+import webpackHotMiddleware from "webpack-hot-middleware";
+import webpackConfig from "./../webpack.config.client.js";
 
 const compile = (app) => {
   if (config.env === "development") {
@@ -11,8 +11,10 @@ const compile = (app) => {
       publicPath: webpackConfig.output.publicPath,
     });
     app.use(middleware);
-    app.use(WebpackHotMiddleware(compiler));
+    app.use(webpackHotMiddleware(compiler));
   }
 };
 
-export default { compile };
+export default {
+  compile,
+};
